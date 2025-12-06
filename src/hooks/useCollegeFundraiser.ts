@@ -204,6 +204,39 @@ export function useCollegeFundraiser() {
       abi: CONTRACT_ABI,
       functionName: "approveTicket",
       args: [ticketId, parseEther(targetAmount), startTime, endTime],
+      gas: BigInt(500_000),
+    });
+  };
+
+  // --- NEW FUNCTIONS ADDED BELOW ---
+
+  const closeFundraising = async (ticketId: bigint) => {
+    return writeContract({
+      address: CONTRACT_ADDRESS,
+      abi: CONTRACT_ABI,
+      functionName: "closeFundraising",
+      args: [ticketId],
+      gas: BigInt(500_000),
+    });
+  };
+
+  const withdrawFunds = async (ticketId: bigint, recipient: `0x${string}`) => {
+    return writeContract({
+      address: CONTRACT_ADDRESS,
+      abi: CONTRACT_ABI,
+      functionName: "withdrawFunds",
+      args: [ticketId, recipient],
+      gas: BigInt(500_000),
+    });
+  };
+
+  const markProjectComplete = async (ticketId: bigint) => {
+    return writeContract({
+      address: CONTRACT_ADDRESS,
+      abi: CONTRACT_ABI,
+      functionName: "markProjectComplete",
+      args: [ticketId],
+      gas: BigInt(500_000),
     });
   };
 
@@ -214,6 +247,9 @@ export function useCollegeFundraiser() {
     vote,
     fundTicket,
     approveTicket,
+    closeFundraising,    // Exported
+    withdrawFunds,       // Exported
+    markProjectComplete, // Exported
     isPending,
     isConfirming,
     isSuccess,
@@ -239,12 +275,15 @@ export function useTicketCount() {
   });
 }
 
-export function useUser(userAddress: `0x${string}`) {
+export function useUser(userAddress: `0x${string}` | undefined) {
   return useReadContract({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
     functionName: "getUser",
-    args: [userAddress],
+    args: userAddress ? [userAddress] : undefined,
+    query: {
+      enabled: !!userAddress, 
+    },
   });
 }
 
