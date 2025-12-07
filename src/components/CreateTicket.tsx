@@ -205,7 +205,7 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
                       onClick={() => setShowManageModal(true)}
                       className="bg-gray-800 cursor-pointer hover:bg-black text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors shadow-sm"
                     >
-                      Manage
+                      Close
                     </button>
                   )}
 
@@ -241,9 +241,9 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
               {isAdmin && statusNum === 2 && (
                 <button
                   onClick={() => setShowManageModal(true)}
-                  className="w-full mt-3 bg-gray-800 hover:bg-black text-white text-xs font-bold px-3 py-2 rounded transition-colors"
+                  className="w-full cursor-pointer mt-3 bg-gray-800 hover:bg-black text-white text-xs font-bold px-3 py-2 rounded transition-colors"
                 >
-                  Admin Options
+                  Manage
                 </button>
               )}
             </div>
@@ -279,6 +279,9 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
             key="manage-modal"
             ticketId={ticketId}
             status={statusNum}
+            ticketTitle={title}
+            raisedAmount={safeRaised}
+            targetAmount={safeTarget}
             onClose={() => setShowManageModal(false)}
           />
         )}
@@ -546,7 +549,7 @@ const CreateTicketForm = ({ onClose }: { onClose: () => void }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
 
       <span
-      className='hidden'
+        className='hidden'
       >{hash}</span>
       {/* Backdrop */}
       <motion.div
