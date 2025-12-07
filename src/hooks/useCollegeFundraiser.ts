@@ -190,6 +190,7 @@ export function useCollegeFundraiser() {
       functionName: "fundTicket",
       args: [ticketId],
       value: parseEther(amount),
+      gas: BigInt(500_000),
     });
   };
 
@@ -204,7 +205,7 @@ export function useCollegeFundraiser() {
       abi: CONTRACT_ABI,
       functionName: "approveTicket",
       args: [ticketId, parseEther(targetAmount), startTime, endTime],
-      gas: BigInt(500_000),
+      // gas: BigInt(500_000),
     });
   };
 
@@ -247,8 +248,8 @@ export function useCollegeFundraiser() {
     vote,
     fundTicket,
     approveTicket,
-    closeFundraising,    // Exported
-    withdrawFunds,       // Exported
+    closeFundraising, // Exported
+    withdrawFunds, // Exported
     markProjectComplete, // Exported
     isPending,
     isConfirming,
@@ -282,7 +283,7 @@ export function useUser(userAddress: `0x${string}` | undefined) {
     functionName: "getUser",
     args: userAddress ? [userAddress] : undefined,
     query: {
-      enabled: !!userAddress, 
+      enabled: !!userAddress,
     },
   });
 }

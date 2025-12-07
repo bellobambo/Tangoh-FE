@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { useCollegeFundraiser, useUser } from '../hooks/useCollegeFundraiser';
 import { CreateTicket } from '../components/CreateTicket';
+import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
+// import Loader from './Loader';
 
 const ROLES = [
   { value: 0, label: 'Student', description: 'Can create tickets and vote' },
@@ -26,10 +29,9 @@ const Home = () => {
     error: writeError,
   } = useCollegeFundraiser();
 
-  // FETCH USER DATA
-  const { data: userData, isLoading: isLoadingUser, refetch: refetchUser } = useUser(address as `0x${string}`);
+  // const { data: userData, isLoading: isLoadingUser, refetch: refetchUser } = useUser(address as `0x${string}`);
+  const { data: userData, isLoading: isLoadingUser } = useUser(address as `0x${string}`);
 
-  // Check Registration Status
   useEffect(() => {
     if (userData && userData[0]) {
       if (userData[0] !== ZERO_BYTES32) {
@@ -39,12 +41,17 @@ const Home = () => {
       }
     }
   }, [userData]);
-
   useEffect(() => {
     if (isRegSuccess) {
-      refetchUser();
+      toast.success('Registration Successful!');
+
+      const timer = setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+
+      return () => clearTimeout(timer);
     }
-  }, [isRegSuccess, refetchUser]);
+  }, [isRegSuccess]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -56,26 +63,27 @@ const Home = () => {
     catch (err: any) { setError(err.message || 'Failed'); }
   };
 
-  const resetForm = () => {
-    setName('');
-    setSelectedRole(0);
-    setError('');
-    window.location.reload();
-  };
 
-  // --- RENDER HELPERS ---
-
-  const AuthCard = ({ title, children }: { title: string, children: React.ReactNode }) => (
+  const AuthCard = ({ title, children, layoutKey }: { title: string, children: React.ReactNode, layoutKey: string }) => (
     <div className="flex flex-col items-center justify-center pt-10 px-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-[600px] border border-gray-100">
+
+      
+      <motion.div
+        key={layoutKey}
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: -10 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-[600px] border border-gray-100"
+      >
         <h2 className="text-2xl font-bold text-[#596576] mb-6 text-center">{title}</h2>
         {children}
-      </div>
+      </motion.div>
     </div>
   );
 
   const renderRegistrationForm = () => (
-    <AuthCard title="Create a TangoH Account">
+    <AuthCard title="Create a TangoH Account" layoutKey="register">
       <div className="space-y-6">
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
@@ -126,57 +134,61 @@ const Home = () => {
         <button
           onClick={handleSubmit}
           disabled={isPending || isConfirming || !name.trim()}
-          className="w-full bg-[#7D8CA3] cursor-pointer hover:bg-indigo-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-xl shadow-md"
+          className="w-full bg-[#7D8CA3] cursor-pointer hover:bg-[#596576] disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-colors"
         >
-          {isPending ? 'Waiting...' : isConfirming ? 'Registering...' : 'Register'}
+          {isPending ? 'Loading...' : isConfirming ? 'Registering...' : 'Register'}
         </button>
 
-        {isRegSuccess && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-            <p className="text-green-800 font-semibold mb-2">✅ Registration Successful!</p>
-            <button onClick={resetForm} className="text-sm text-[#7D8CA3] hover:text-indigo-700 font-medium">Refresh</button>
-          </div>
-        )}
       </div>
     </AuthCard>
   );
 
-  // --- LOADING STATE ---
   if (isConnected && isLoadingUser) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen  flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#7D8CA3] mx-auto mb-4"></div>
-          <p className="text-gray-500">Loading Blockchain Data...</p>
+
+
+          <div className="flex items-center justify-center h-12 w-12 mx-auto mb-4 relative">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-20"></span>
+            <span className="relative inline-flex rounded-full h-6 w-6 bg-white"></span>
+          </div>
+
+          <p className="text-white">Loading Blockchain Data...</p>
         </div>
       </div>
     );
   }
 
-  // --- MAIN PAGE LAYOUT ---
+
 
   return (
-    <div className="min-h-screen bg-[#7D8CA3] font-sans">
-      {/* Main Content Area */}
+    <div className="min-h-screen bg-[#7D8CA3] ">
       <main className="max-w-[1500px] mx-auto p-4 md:p-6 lg:p-8">
 
-        {/* Logic Tree for Views */}
-        {!isConnected ? (
-          <AuthCard title="Welcome to TangoH">
-            <div className="text-center space-y-4">
-              <p className="text-[#7D8CA3]">Connect your wallet to raise or fund college concerns.</p>
-              <div className="pt-2">
-                <i className="text-[#a4b3c9] whitespace-nowrap">All interactions on TangoH are recorded on the Arbitrum Blockchain</i>              </div>
-            </div>
-          </AuthCard>
-        ) : !isRegistered ? (
-          renderRegistrationForm()
-        ) : (
-          /* 🚀 DASHBOARD VIEW - FULL WIDTH */
-          <div className="w-full animate-fade-in">
-            <CreateTicket />
-          </div>
-        )}
+        <AnimatePresence mode="wait">
+          {!isConnected ? (
+            <AuthCard title="Welcome to TangoH" layoutKey="welcome" key="welcome">
+              <div className="text-center space-y-4">
+                <p className="text-[#7D8CA3]">Connect your wallet to raise or fund college concerns.</p>
+                <div className="pt-2">
+                  <i className="text-[#a4b3c9] whitespace-nowrap">All interactions on TangoH are recorded on the Arbitrum Blockchain</i>
+                </div>
+              </div>
+            </AuthCard>
+          ) : !isRegistered ? (
+            <div key="reg-form">{renderRegistrationForm()}</div>
+          ) : (
+            <motion.div
+              key="dashboard"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="w-full"
+            >
+              <CreateTicket />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       </main>
     </div>

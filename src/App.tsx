@@ -4,7 +4,7 @@ import Home from './components/Home'
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-[#7D8CA3] text-gray-900">
       <Navbar />
       
       <Routes>

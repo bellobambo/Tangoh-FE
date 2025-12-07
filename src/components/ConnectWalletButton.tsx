@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import Loader from './Loader';
 
 const ConnectWalletButton = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -19,9 +20,13 @@ const ConnectWalletButton = () => {
 
   if (!isMounted) {
     return (
-      <button className="px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed" disabled>
-        Loading...
-      </button>
+
+      <>
+        <Loader />
+        <button className="px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed" disabled>
+          Loading...
+        </button>
+      </>
     );
   }
 
@@ -46,7 +51,7 @@ const ConnectWalletButton = () => {
       <button
         onClick={() => injectedConnector && connect({ connector: injectedConnector })}
         disabled={isConnecting || isPending}
-        className="px-6 py-3 bg-[#7D8CA3] cursor-pointer text-white font-medium rounded-lg transition-all duration-200 hover:scale-105 disabled:bg-blue-300 disabled:cursor-not-allowed disabled:hover:scale-100"      >
+        className="px-6 py-3 bg-[#7D8CA3] cursor-pointer text-white font-medium rounded-lg transition-all duration-200 hover:scale-105 disabled:bg-[#596576] disabled:cursor-not-allowed disabled:hover:scale-100"      >
         {isConnecting || isPending ? 'Connecting...' : 'Connect Wallet'}
       </button>
 
