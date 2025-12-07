@@ -77,4 +77,4 @@ export default defineConfig([
 
 color code :
 main color - #7D8CA3
-secondary color - #59544B
+secondary color - [#596576]

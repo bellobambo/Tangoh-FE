@@ -46,17 +46,16 @@ const ConnectWalletButton = () => {
       <button
         onClick={() => injectedConnector && connect({ connector: injectedConnector })}
         disabled={isConnecting || isPending}
-        className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
-      >
+        className="px-6 py-3 bg-[#7D8CA3] cursor-pointer text-white font-medium rounded-lg transition-all duration-200 hover:scale-105 disabled:bg-blue-300 disabled:cursor-not-allowed disabled:hover:scale-100"      >
         {isConnecting || isPending ? 'Connecting...' : 'Connect Wallet'}
       </button>
-      
+
       {error && (
         <div className="text-red-500 text-sm mt-1">
           Error: {error.message}
         </div>
       )}
-      
+
       {!injectedConnector && (
         <div className="text-yellow-600 text-sm mt-1">
           Please install a wallet like MetaMask
