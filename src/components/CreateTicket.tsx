@@ -50,21 +50,21 @@ const backdropVariants = {
 
 const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number }) => {
   const { address } = useAccount();
-  
+
   // 1. Fetch Ticket Data
   const { data: ticket, isLoading } = useTicket(ticketId);
-  
+
   // 2. Check if User has Voted
   const { data: hasVoted } = useHasVoted(ticketId, address);
 
   // 3. Destructure Contract Actions
-  const { 
-    vote, 
-    approveTicket, 
+  const {
+    vote,
+    approveTicket,
     acknowledgeTicket,
-    isPending, 
-    isConfirming, 
-    isSuccess 
+    isPending,
+    isConfirming,
+    isSuccess
   } = useCollegeFundraiser();
 
   const [votingAction, setVotingAction] = useState<'up' | 'down' | null>(null);
@@ -83,9 +83,9 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
         toast.success('Ticket Acknowledged!');
         setIsAcknowledging(false);
       }
-      
+
       const timer = setTimeout(() => {
-        window.location.reload(); 
+        window.location.reload();
       }, 1500);
       return () => clearTimeout(timer);
     }
@@ -159,20 +159,19 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
 
   const isActionLoading = isPending || isConfirming;
   const isAdmin = userRole === 1;
-  
+
   // --- CHECK IF CURRENT USER IS CREATOR ---
   const isCreator = address && creator && address.toLowerCase() === creator.toLowerCase();
-  
+
   const progressPercent = Math.min((Number(safeRaised) / (Number(safeTarget) || 1)) * 100, 100);
 
   return (
     <>
       <div className="bg-white border border-gray-200 h-[280px] rounded-xl p-5 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between relative overflow-hidden">
-        
-        {/* Badge: Shows when Creator has acknowledged the completed project */}
+
         {acknowledged && (
           <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg z-10 flex items-center gap-1 shadow-sm">
-            <CheckCircleOutlined /> Received
+            <CheckCircleOutlined /> Resolved
           </div>
         )}
 
@@ -182,10 +181,10 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
             <span className={`px-3 py-1 text-xs font-bold rounded-full ${statusColors[statusNum] || 'bg-gray-100'}`}>
               {statusMap[statusNum] || "Unknown"}
             </span>
-            
+
             <div className="flex items-center gap-2 mt-6 sm:mt-0">
               <span className="text-xs text-gray-400">#{ticketId.toString()}</span>
-              
+
               {/* 1. Admin Approve Button (Only visible to Admin when Pending) */}
               {isAdmin && statusNum === 0 && (
                 <button
@@ -196,21 +195,17 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
                 </button>
               )}
 
-              {/* 2. Acknowledge Button:
-                 - Visible ONLY to the Creator
-                 - Visible ONLY when Status is Completed (3)
-                 - Visible ONLY if not yet acknowledged
-              */}
+          
               {isCreator && statusNum === 3 && !acknowledged && (
-                 <button
-                   onClick={handleAcknowledge}
-                   disabled={isActionLoading}
-                   className="bg-orange-400 hover:bg-orange-500 cursor-pointer text-white px-2 py-1.5 rounded text-xs font-semibold transition-all active:scale-95 flex items-center gap-1"
-                   title="Confirm you have received the project/funds"
-                 >
-                   {isActionLoading && isAcknowledging ? <LoadingOutlined /> : <CheckOutlined />} 
-                   Acknowledge
-                 </button>
+                <button
+                  onClick={handleAcknowledge}
+                  disabled={isActionLoading}
+                  className="bg-white border border-[#7D8CA3] hover:border-[#596576] hover:scale-105 cursor-pointer text-black px-2 py-1.5 rounded text-xs font-semibold transition-all active:scale-95 flex items-center gap-1"
+                  title="Confirm you have received the project/funds"
+                >
+                  {isActionLoading && isAcknowledging ? <LoadingOutlined /> : <CheckOutlined />}
+                  Acknowledge
+                </button>
               )}
             </div>
           </div>
@@ -224,21 +219,20 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
           {statusNum === 0 && (
             <div className="flex items-center justify-between">
               <div className='flex flex-col'>
-                 <span className="text-sm text-gray-500">Votes:</span>
-                 {hasVoted && <span className="text-[10px] text-green-600 font-bold">You voted</span>}
+                <span className="text-sm text-gray-500">Votes:</span>
+                {hasVoted && <span className="text-[10px] text-green-600 font-bold">You voted</span>}
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleVote(true)}
-                  disabled={isActionLoading || hasVoted} 
-                  className={`p-2 rounded-lg transition-all cursor-pointer flex items-center justify-center ${
-                    isActionLoading && votingAction === 'up' 
-                    ? 'bg-green-100 text-green-600' 
-                    : hasVoted
-                      ? 'opacity-30 cursor-not-allowed text-gray-400'
-                      : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
-                  }`}
+                  disabled={isActionLoading || hasVoted}
+                  className={`p-2 rounded-lg transition-all cursor-pointer flex items-center justify-center ${isActionLoading && votingAction === 'up'
+                      ? 'bg-green-100 text-green-600'
+                      : hasVoted
+                        ? 'opacity-30 cursor-not-allowed text-gray-400'
+                        : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
+                    }`}
                 >
                   {isActionLoading && votingAction === 'up' ? <LoadingOutlined /> : <LikeOutlined className="text-lg" />}
                 </button>
@@ -250,13 +244,12 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
                 <button
                   onClick={() => handleVote(false)}
                   disabled={isActionLoading || hasVoted}
-                  className={`p-2 rounded-lg transition-all cursor-pointer flex items-center justify-center ${
-                    isActionLoading && votingAction === 'down' 
-                    ? 'bg-red-100 text-red-600' 
-                    : hasVoted
-                      ? 'opacity-30 cursor-not-allowed text-gray-400'
-                      : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
-                  }`}
+                  className={`p-2 rounded-lg transition-all cursor-pointer flex items-center justify-center ${isActionLoading && votingAction === 'down'
+                      ? 'bg-red-100 text-red-600'
+                      : hasVoted
+                        ? 'opacity-30 cursor-not-allowed text-gray-400'
+                        : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
+                    }`}
                 >
                   {isActionLoading && votingAction === 'down' ? <LoadingOutlined /> : <DislikeOutlined className="text-lg" />}
                 </button>
