@@ -1,80 +1,16 @@
-# React + TypeScript + Vite
+**TangoH: Amplifying Student Voices to Address Campus Issues** 🌟
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 🌐 Live Deployment
+**Platform:** TangoH  
+**Network:** Arbitrum Stylus  
+**Contract Address:** `0xcDFb1272Fad230337C553e8c5649d5C5cf361f03`
 
-Currently, two official plugins are available:
+## 📖 Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+TangoH creates a direct, transparent channel for students to report campus issues. 🚀 This platform turns ignored complaints and lost maintenance requests into prioritized, verifiable action items. From broken hostel furniture to safety hazards, TangoH ensures student concerns are heard, validated by the community, and escalated effectively.
 
-## React Compiler
+**The Problem:** Students face daily frustrations when their concerns go unheard. Reports get lost, emails are ignored, and urgent problems like broken windows or faulty equipment remain unfixed. TangoH makes it hard for students' voices to reach those who can help. 🚧
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+**The Solution:** TangoH ensures no student's voice is lost. Report issues and let the entire student body vote on them. The problems with the most votes get the most attention, giving campus authorities a clear mandate on what matters most to students. Every report and vote is secured on the blockchain, creating a permanent and transparent record of what students need fixed. ✅
 
-Note: This will impact Vite dev & build performances.
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-
-color code :
-main color - #7D8CA3
-secondary color - [#596576]
+TangoH transforms fragmented complaints into organized, actionable data for campus authorities while empowering students with transparency and collective voice. Build a better campus through collaboration, accountability, and amplified advocacy! 🎉✨

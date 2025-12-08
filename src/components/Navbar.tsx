@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAccount, useDisconnect, useBalance } from 'wagmi'
 import { hexToString, formatEther } from 'viem' // 1. Added formatEther
-import toast from 'react-hot-toast' 
+import toast from 'react-hot-toast'
 import ConnectWalletButton from './ConnectWalletButton'
 import { useUser } from '../hooks/useCollegeFundraiser'
 
@@ -36,7 +36,7 @@ const Navbar = () => {
                 const decodedName = hexToString(userData[0], { size: 32 }).replace(/\0/g, '');
                 setRegisteredName(decodedName);
 
-                const roleIndex = Number(userData[1]); 
+                const roleIndex = Number(userData[1]);
                 const decodedRole = ROLE_MAP[roleIndex] || 'Student';
                 setUserRole(decodedRole);
             } catch (e) {
@@ -67,7 +67,14 @@ const Navbar = () => {
                     {/* Left Side: Logo & Links */}
                     <div className="flex items-center">
                         <Link to="/" className="flex items-center gap-2">
-                            <span className="text-xl font-bold text-[#7D8CA3]">TangoH</span>
+
+
+                            <span className="text-xl font-bold text-[#7D8CA3] flex items-center">
+                                Tang
+                                <span className="bg-[#7D8CA3] text-white px-1 ml-0.5">
+                                    oH
+                                </span>
+                            </span>
                         </Link>
                     </div>
 
@@ -75,12 +82,12 @@ const Navbar = () => {
                     <div className="flex items-center gap-4">
                         {isConnected ? (
                             <div className="flex items-center gap-4 bg-gray-50 px-4 py-2 rounded-xl border border-gray-200">
-                                
+
                                 {/* User Info */}
                                 <div className="text-right hidden sm:block">
                                     {registeredName && (
                                         <div className="flex flex-col items-end justify-center h-full">
-                                            
+
                                             {/* --- ROW 1: Name . Role --- */}
                                             <div className="flex items-center gap-2 leading-none mb-1">
                                                 {/* Name */}
@@ -96,12 +103,12 @@ const Navbar = () => {
                                                     {userRole || 'USER'}
                                                 </span>
                                             </div>
-                                            
+
                                             {/* --- ROW 2: Wallet . Balance --- */}
                                             <div className="flex items-center gap-2 text-[16px] font-mono text-gray-500">
-                                                
+
                                                 {/* Wallet Address */}
-                                                <button 
+                                                <button
                                                     onClick={handleCopyAddress}
                                                     className="hover:text-[#596576] transition-colors cursor-pointer border-b border-transparent hover:border-[#596576] focus:outline-none"
                                                     title="Copy Address"
@@ -114,8 +121,8 @@ const Navbar = () => {
 
                                                 {/* Balance - 3. Fix: Use formatEther(value) */}
                                                 <span className="text-[#596576] text-[16px] font-bold">
-                                                    {balanceLoading || !balanceData 
-                                                        ? '...' 
+                                                    {balanceLoading || !balanceData
+                                                        ? '...'
                                                         : `${Number(formatEther(balanceData.value)).toFixed(4)} ${balanceData.symbol}`
                                                     }
                                                 </span>
@@ -135,7 +142,7 @@ const Navbar = () => {
                                     onClick={() => disconnect()}
                                     className="text-[14px] font-semibold cursor-pointer text-gray-400 hover:text-red-500 px-2 py-1 transition-colors"
                                 >
-                                  Disconnet
+                                    Disconnet
                                 </button>
                             </div>
                         ) : (

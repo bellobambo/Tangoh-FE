@@ -64,10 +64,8 @@ const Home = () => {
   };
 
 
-  const AuthCard = ({ title, children, layoutKey }: { title: string, children: React.ReactNode, layoutKey: string }) => (
+  const AuthCard = ({ title, children, layoutKey }: { title: React.ReactNode, children: React.ReactNode, layoutKey: string }) => (
     <div className="flex flex-col items-center justify-center pt-10 px-4">
-
-      
       <motion.div
         key={layoutKey}
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -76,15 +74,31 @@ const Home = () => {
         transition={{ duration: 0.3, ease: "easeOut" }}
         className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-[600px] border border-gray-100"
       >
-        <h2 className="text-2xl font-bold text-[#596576] mb-6 text-center">{title}</h2>
+        {/* Title is now rendered directly as a node */}
+        <div className="text-2xl font-bold text-[#596576] mb-6 text-center">{title}</div>
         {children}
       </motion.div>
     </div>
   );
 
   const renderRegistrationForm = () => (
-    <AuthCard title="Create a TangoH Account" layoutKey="register">
+    <AuthCard
+      title={
+        <span>
+          Create a{' '}
+          <span className="text-[#7D8CA3] font-bold">
+            Tang
+            <span className="bg-[#7D8CA3] text-white px-1 ml-0.5">
+              oH
+            </span>
+          </span>
+          {' '}Account
+        </span>
+      }
+      layoutKey="register"
+    >
       <div className="space-y-6">
+        {/* ... existing form inputs ... */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
           <input
@@ -168,11 +182,27 @@ const Home = () => {
 
         <AnimatePresence mode="wait">
           {!isConnected ? (
-            <AuthCard title="Welcome to TangoH" layoutKey="welcome" key="welcome">
+            <AuthCard
+              title={
+                <span>
+                  Welcome to{' '}
+                  <span className="text-[#7D8CA3] font-bold">
+                    Tang
+                    <span className="bg-[#7D8CA3] text-white px-1 ml-0.5">
+                      oH
+                    </span>
+                  </span>
+                </span>
+              }
+              layoutKey="welcome"
+              key="welcome"
+            >
               <div className="text-center space-y-4">
                 <p className="text-[#7D8CA3]">Connect your wallet to raise or fund college concerns.</p>
                 <div className="pt-2">
-                  <i className="text-[#a4b3c9] whitespace-nowrap">All interactions on TangoH are recorded on the Arbitrum Blockchain</i>
+                  <i className="text-[#a4b3c9] whitespace-nowrap">
+                    All interactions on TangoH are recorded on the Arbitrum Blockchain
+                  </i>
                 </div>
               </div>
             </AuthCard>
