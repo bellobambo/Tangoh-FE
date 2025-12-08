@@ -180,7 +180,7 @@ export function useCollegeFundraiser() {
       abi: CONTRACT_ABI,
       functionName: "registerUser",
       args: [stringToBytes32(name), role],
-      gas: BigInt(500_000),
+      gas: BigInt(400_000),
     });
   };
 
@@ -200,7 +200,7 @@ export function useCollegeFundraiser() {
       abi: CONTRACT_ABI,
       functionName: "vote",
       args: [ticketId, upvote],
-      gas: BigInt(500_000),
+      gas: BigInt(250_000),
     });
   };
 
@@ -211,7 +211,7 @@ export function useCollegeFundraiser() {
       functionName: "fundTicket",
       args: [ticketId],
       value: parseEther(amount),
-      gas: BigInt(500_000),
+      gas: BigInt(250_000),
     });
   };
 
@@ -226,7 +226,7 @@ export function useCollegeFundraiser() {
       abi: CONTRACT_ABI,
       functionName: "approveTicket",
       args: [ticketId, parseEther(targetAmount), startTime, endTime],
-      gas: BigInt(500_000),
+      gas: BigInt(250_000),
     });
   };
 
@@ -236,7 +236,7 @@ export function useCollegeFundraiser() {
       abi: CONTRACT_ABI,
       functionName: "closeFundraising",
       args: [ticketId],
-      gas: BigInt(500_000),
+      gas: BigInt(50_000),
     });
   };
 
@@ -246,7 +246,7 @@ export function useCollegeFundraiser() {
       abi: CONTRACT_ABI,
       functionName: "withdrawFunds",
       args: [ticketId, recipient],
-      gas: BigInt(500_000),
+      gas: BigInt(100_000),
     });
   };
 
@@ -256,7 +256,7 @@ export function useCollegeFundraiser() {
       abi: CONTRACT_ABI,
       functionName: "markProjectComplete",
       args: [ticketId],
-      gas: BigInt(500_000),
+      gas: BigInt(50_000),
     });
   };
 
@@ -267,7 +267,7 @@ export function useCollegeFundraiser() {
       abi: CONTRACT_ABI,
       functionName: "acknowledgeTicket",
       args: [ticketId],
-      gas: BigInt(500_000),
+      gas: BigInt(50_000),
     });
   };
 
