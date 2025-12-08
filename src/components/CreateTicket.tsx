@@ -7,11 +7,12 @@ import {
   useCollegeFundraiser,
   useTicket,
   useTicketCount,
-  useUser
+  useUser,
+  useHasVoted
 } from '../hooks/useCollegeFundraiser';
 import FundModal from './FundModal';
 import ManageProjectModal from './ManageProjectModal';
-import { LikeOutlined, DislikeOutlined, LoadingOutlined } from '@ant-design/icons';
+import { LikeOutlined, DislikeOutlined, LoadingOutlined, CheckCircleOutlined, CheckOutlined } from '@ant-design/icons';
 import Loader from './Loader';
 
 // --- FIXED: Decode Bytes32 ---
@@ -48,26 +49,50 @@ const backdropVariants = {
 };
 
 const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number }) => {
+  const { address } = useAccount();
+
+  // 1. Fetch Ticket Data
   const { data: ticket, isLoading } = useTicket(ticketId);
-  const { vote, approveTicket, isPending, isConfirming, isSuccess } = useCollegeFundraiser();
+
+  // 2. Check if User has Voted
+  const { data: hasVoted } = useHasVoted(ticketId, address);
+
+  // 3. Destructure Contract Actions
+  const {
+    vote,
+    approveTicket,
+    acknowledgeTicket,
+    isPending,
+    isConfirming,
+    isSuccess
+  } = useCollegeFundraiser();
 
   const [votingAction, setVotingAction] = useState<'up' | 'down' | null>(null);
+  const [isAcknowledging, setIsAcknowledging] = useState(false);
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showFundModal, setShowFundModal] = useState(false);
   const [showManageModal, setShowManageModal] = useState(false);
 
-  // --- VOTING SUCCESS LOGIC ---
+  // --- SUCCESS TOASTS ---
   useEffect(() => {
-    if (isSuccess && votingAction) {
-      toast.success(votingAction === 'up' ? 'Upvoted Successfully!' : 'Downvoted Successfully!');
+    if (isSuccess) {
+      if (votingAction) {
+        toast.success(votingAction === 'up' ? 'Upvoted Successfully!' : 'Downvoted Successfully!');
+        setVotingAction(null);
+      } else if (isAcknowledging) {
+        toast.success('Ticket Acknowledged!');
+        setIsAcknowledging(false);
+      }
+
       const timer = setTimeout(() => {
         window.location.reload();
       }, 1500);
       return () => clearTimeout(timer);
     }
-  }, [isSuccess, votingAction]);
+  }, [isSuccess, votingAction, isAcknowledging]);
 
   const handleVote = async (upvote: boolean) => {
+    if (hasVoted) return;
     try {
       setVotingAction(upvote ? 'up' : 'down');
       await vote(ticketId, upvote);
@@ -75,6 +100,17 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
       console.error('Vote error:', error);
       toast.error(error.message || 'Voting failed');
       setVotingAction(null);
+    }
+  };
+
+  const handleAcknowledge = async () => {
+    try {
+      setIsAcknowledging(true);
+      await acknowledgeTicket(ticketId);
+    } catch (error: any) {
+      console.error('Acknowledge error:', error);
+      toast.error(error.message || 'Action failed');
+      setIsAcknowledging(false);
     }
   };
 
@@ -100,7 +136,8 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
     votes,
     targetAmount,
     raisedAmount,
-    status
+    status,
+    acknowledged
   ] = ticket;
 
   const title = decodeBytes32String(titleHex);
@@ -120,27 +157,54 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
     "bg-green-100 text-green-800"
   ];
 
-  const isVoting = isPending || isConfirming;
+  const isActionLoading = isPending || isConfirming;
   const isAdmin = userRole === 1;
+
+  // --- CHECK IF CURRENT USER IS CREATOR ---
+  const isCreator = address && creator && address.toLowerCase() === creator.toLowerCase();
+
   const progressPercent = Math.min((Number(safeRaised) / (Number(safeTarget) || 1)) * 100, 100);
 
   return (
     <>
-      <div className="bg-white border border-gray-200 h-[280px] rounded-xl p-5 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between">
+      <div className="bg-white border border-gray-200 h-[280px] rounded-xl p-5 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between relative overflow-hidden">
+
+        {acknowledged && (
+          <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg z-10 flex items-center gap-1 shadow-sm">
+            <CheckCircleOutlined /> Resolved
+          </div>
+        )}
+
         <span className='hidden'>{creator} {approver}</span>
         <div>
           <div className="flex justify-between items-start mb-3">
             <span className={`px-3 py-1 text-xs font-bold rounded-full ${statusColors[statusNum] || 'bg-gray-100'}`}>
               {statusMap[statusNum] || "Unknown"}
             </span>
-            <div className="flex items-center gap-2">
+
+            <div className="flex items-center gap-2 mt-6 sm:mt-0">
               <span className="text-xs text-gray-400">#{ticketId.toString()}</span>
+
+              {/* 1. Admin Approve Button (Only visible to Admin when Pending) */}
               {isAdmin && statusNum === 0 && (
                 <button
                   onClick={() => setShowApproveModal(true)}
                   className="bg-[#7D8CA3] hover:bg-[#596576] cursor-pointer text-white px-2 py-1.5 rounded text-xs font-semibold transition-all active:scale-95"
                 >
                   Approve
+                </button>
+              )}
+
+          
+              {isCreator && statusNum === 3 && !acknowledged && (
+                <button
+                  onClick={handleAcknowledge}
+                  disabled={isActionLoading}
+                  className="bg-white border border-[#7D8CA3] hover:border-[#596576] hover:scale-105 cursor-pointer text-black px-2 py-1.5 rounded text-xs font-semibold transition-all active:scale-95 flex items-center gap-1"
+                  title="Confirm you have received the project/funds"
+                >
+                  {isActionLoading && isAcknowledging ? <LoadingOutlined /> : <CheckOutlined />}
+                  Acknowledge
                 </button>
               )}
             </div>
@@ -154,15 +218,23 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
           {/* Status 0: PENDING */}
           {statusNum === 0 && (
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">Votes:</span>
+              <div className='flex flex-col'>
+                <span className="text-sm text-gray-500">Votes:</span>
+                {hasVoted && <span className="text-[10px] text-green-600 font-bold">You voted</span>}
+              </div>
+
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleVote(true)}
-                  disabled={isVoting}
-                  className={`p-2 rounded-lg transition-all cursor-pointer flex items-center justify-center ${isVoting && votingAction === 'up' ? 'bg-green-100 text-green-600' : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
+                  disabled={isActionLoading || hasVoted}
+                  className={`p-2 rounded-lg transition-all cursor-pointer flex items-center justify-center ${isActionLoading && votingAction === 'up'
+                      ? 'bg-green-100 text-green-600'
+                      : hasVoted
+                        ? 'opacity-30 cursor-not-allowed text-gray-400'
+                        : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
                     }`}
                 >
-                  {isVoting && votingAction === 'up' ? <LoadingOutlined /> : <LikeOutlined className="text-lg" />}
+                  {isActionLoading && votingAction === 'up' ? <LoadingOutlined /> : <LikeOutlined className="text-lg" />}
                 </button>
 
                 <span className={`font-semibold min-w-5 text-center ${safeVotes > 0 ? 'text-green-600' : 'text-gray-700'}`}>
@@ -171,11 +243,15 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
 
                 <button
                   onClick={() => handleVote(false)}
-                  disabled={isVoting}
-                  className={`p-2 rounded-lg transition-all cursor-pointer flex items-center justify-center ${isVoting && votingAction === 'down' ? 'bg-red-100 text-red-600' : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
+                  disabled={isActionLoading || hasVoted}
+                  className={`p-2 rounded-lg transition-all cursor-pointer flex items-center justify-center ${isActionLoading && votingAction === 'down'
+                      ? 'bg-red-100 text-red-600'
+                      : hasVoted
+                        ? 'opacity-30 cursor-not-allowed text-gray-400'
+                        : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
                     }`}
                 >
-                  {isVoting && votingAction === 'down' ? <LoadingOutlined /> : <DislikeOutlined className="text-lg" />}
+                  {isActionLoading && votingAction === 'down' ? <LoadingOutlined /> : <DislikeOutlined className="text-lg" />}
                 </button>
               </div>
             </div>
@@ -199,7 +275,6 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
                 </div>
 
                 <div className="flex gap-2">
-                  {/* Manage Button: Only visible to Admins */}
                   {isAdmin && (
                     <button
                       onClick={() => setShowManageModal(true)}
@@ -208,8 +283,6 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
                       Close
                     </button>
                   )}
-
-                  {/* Contribute Button: Visible to Everyone (including Admins) */}
                   <button
                     onClick={() => setShowFundModal(true)}
                     className="bg-[#596576] cursor-pointer hover:bg-[#7D8CA3] text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors shadow-sm active:scale-95"
@@ -674,8 +747,8 @@ export const CreateTicket = () => {
             <Loader />
           </div>
         ) : ticketIds.length === 0 ? (
-          <div className="text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-            <p className="text-gray-400 text-sm">No concerns raised yet.</p>
+          <div className="text-center py-10 ">
+            <p className="text-white text-lg">No concerns raised yet.</p>
           </div>
         ) : (
           <div className="grid grid-cols-3 gap-4">
