@@ -211,7 +211,7 @@ export function useCollegeFundraiser() {
       functionName: "fundTicket",
       args: [ticketId],
       value: parseEther(amount),
-      gas: BigInt(250_000),
+      gas: BigInt(150_000),
     });
   };
 
