@@ -14,3 +14,8 @@ TangoH creates a direct, transparent channel for students to report campus issue
 **The Solution:** TangoH ensures no student's voice is lost. Report issues and let the entire student body vote on them. The problems with the most votes get the most attention, giving campus authorities a clear mandate on what matters most to students. Every report and vote is secured on the blockchain, creating a permanent and transparent record of what students need fixed. ✅
 
 TangoH transforms fragmented complaints into organized, actionable data for campus authorities while empowering students with transparency and collective voice. Build a better campus through collaboration, accountability, and amplified advocacy! 🎉✨
+
+
+
+## Smart Contract:
+https://github.com/bellobambo/Tangoh-Stylus
