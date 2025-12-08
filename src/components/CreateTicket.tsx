@@ -195,7 +195,7 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
                 </button>
               )}
 
-          
+
               {isCreator && statusNum === 3 && !acknowledged && (
                 <button
                   onClick={handleAcknowledge}
@@ -228,10 +228,10 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
                   onClick={() => handleVote(true)}
                   disabled={isActionLoading || hasVoted}
                   className={`p-2 rounded-lg transition-all cursor-pointer flex items-center justify-center ${isActionLoading && votingAction === 'up'
-                      ? 'bg-green-100 text-green-600'
-                      : hasVoted
-                        ? 'opacity-30 cursor-not-allowed text-gray-400'
-                        : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
+                    ? 'bg-green-100 text-green-600'
+                    : hasVoted
+                      ? 'opacity-30 cursor-not-allowed text-gray-400'
+                      : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
                     }`}
                 >
                   {isActionLoading && votingAction === 'up' ? <LoadingOutlined /> : <LikeOutlined className="text-lg" />}
@@ -245,10 +245,10 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
                   onClick={() => handleVote(false)}
                   disabled={isActionLoading || hasVoted}
                   className={`p-2 rounded-lg transition-all cursor-pointer flex items-center justify-center ${isActionLoading && votingAction === 'down'
-                      ? 'bg-red-100 text-red-600'
-                      : hasVoted
-                        ? 'opacity-30 cursor-not-allowed text-gray-400'
-                        : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
+                    ? 'bg-red-100 text-red-600'
+                    : hasVoted
+                      ? 'opacity-30 cursor-not-allowed text-gray-400'
+                      : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
                     }`}
                 >
                   {isActionLoading && votingAction === 'down' ? <LoadingOutlined /> : <DislikeOutlined className="text-lg" />}
@@ -258,19 +258,33 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
           )}
 
           {/* Status 1: FUNDRAISING */}
+          {/* --- 1. ACTIVE FUNDRAISING (Status 1) --- */}
           {statusNum === 1 && (
             <div className="w-full">
+              {/* Progress Bar Header */}
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-semibold uppercase text-blue-600 tracking-wider">Fundraising Live</span>
-                <span className="text-xs text-gray-500">{progressPercent.toFixed(1)}%</span>
-              </div>
-              <div className="bg-gray-100 rounded-full h-2 mb-3 overflow-hidden">
-                <div className="bg-blue-600 h-2 rounded-full transition-all duration-500" style={{ width: `${progressPercent}%` }}></div>
+                <span className="text-xs font-semibold uppercase text-blue-600 tracking-wider">
+                  Fundraising Live
+                </span>
+                <span className="text-xs text-gray-500">
+                  {progressPercent.toFixed(1)}%
+                </span>
               </div>
 
+              {/* Progress Bar */}
+              <div className="bg-gray-100 rounded-full h-2 mb-3 overflow-hidden">
+                <div
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${progressPercent}%` }}
+                ></div>
+              </div>
+
+              {/* Stats & Actions */}
               <div className="flex justify-between items-center">
                 <div className="text-xs text-gray-500 flex flex-col">
-                  <span className="text-gray-900 font-bold">{formatEther(safeRaised)} ETH</span>
+                  <span className="text-gray-900 font-bold">
+                    {formatEther(safeRaised)} ETH
+                  </span>
                   <span>of {formatEther(safeTarget)} ETH</span>
                 </div>
 
@@ -283,35 +297,49 @@ const TicketItem = ({ ticketId, userRole }: { ticketId: bigint; userRole: number
                       Close
                     </button>
                   )}
+
                   <button
                     onClick={() => setShowFundModal(true)}
-                    className="bg-[#596576] cursor-pointer hover:bg-[#7D8CA3] text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors shadow-sm active:scale-95"
+                    disabled={safeRaised >= safeTarget}
+                    className={`text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors shadow-sm ${safeRaised >= safeTarget
+                      ? "bg-gray-400 cursor-not-allowed opacity-70"
+                      : "bg-[#596576] cursor-pointer hover:bg-[#7D8CA3] active:scale-95"
+                      }`}
                   >
-                    Contribute
+                    {safeRaised >= safeTarget ? "Goal Met" : "Contribute"}
                   </button>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Status > 1: GOAL MET / COMPLETED */}
+          {/* --- 2. COMPLETED / SUCCESSFUL (Status > 1) --- */}
           {statusNum > 1 && (
             <div className="w-full">
               <div className="flex justify-between items-center bg-gray-50 p-4 rounded-lg border border-gray-100">
                 <div className="flex flex-col">
-                  <span className="text-[10px] uppercase text-gray-400 font-bold tracking-wider mb-1">Total Raised</span>
+                  <span className="text-[10px] uppercase text-gray-400 font-bold tracking-wider mb-1">
+                    Total Raised
+                  </span>
                   <span className="text-base font-600 text-gray-500 tracking-tight">
+                    {/* FIX: Use safeRaised and don't round it down */}
                     {formatEther(displayRaised)} ETH
                   </span>
                 </div>
+
                 <div className="w-px h-8 bg-gray-200"></div>
+
                 <div className="flex flex-col items-end">
-                  <span className="text-[10px] uppercase text-gray-400 font-bold tracking-wider mb-1">Votes</span>
-                  <span className="text-base font-600 text-gray-800 tracking-tight">{safeVotes}</span>
+                  <span className="text-[10px] uppercase text-gray-400 font-bold tracking-wider mb-1">
+                    Votes
+                  </span>
+                  <span className="text-base font-600 text-gray-800 tracking-tight">
+                    {safeVotes.toString()}
+                  </span>
                 </div>
               </div>
 
-              {isAdmin && statusNum === 2 && (
+              {isAdmin && statusNum !== 3 && (
                 <button
                   onClick={() => setShowManageModal(true)}
                   className="w-full cursor-pointer mt-3 bg-gray-800 hover:bg-black text-white text-xs font-bold px-3 py-2 rounded transition-colors"

@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 
 const ROLES = [
   { value: 0, label: 'Student', description: 'Can create tickets and vote' },
-  { value: 1, label: 'EXCO (Executive Committee)', description: 'Manage ticket & funding' }
+  { value: 1, label: 'EXCO (Executive Committee)', description: 'Manage Issues' }
 ];
 
 const ZERO_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
@@ -140,7 +140,7 @@ const Home = () => {
         </div>
 
         {(error || writeError) && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="hidden  bg-red-50 border border-red-200 rounded-lg p-4">
             <p className="text-sm text-red-800">⚠️ {error || writeError?.message}</p>
           </div>
         )}
