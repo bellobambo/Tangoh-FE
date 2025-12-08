@@ -5,8 +5,9 @@ import {
 } from "wagmi";
 import { parseEther, stringToHex, padHex } from "viem";
 
+// Updated Contract Address
 const CONTRACT_ADDRESS =
-  "0xbf16c7ca893c075758bc18f66d5a993372a6914d" as `0x${string}`;
+  "0xcDFb1272Fad230337C553e8c5649d5C5cf361f03" as `0x${string}`;
 
 const CONTRACT_ABI = [
   {
@@ -84,6 +85,13 @@ const CONTRACT_ABI = [
   },
   {
     type: "function",
+    name: "acknowledgeTicket",
+    inputs: [{ name: "ticket_id", type: "uint256" }],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "fundTicket",
     inputs: [{ name: "ticket_id", type: "uint256" }],
     outputs: [],
@@ -94,15 +102,26 @@ const CONTRACT_ABI = [
     name: "getTicket",
     inputs: [{ name: "ticket_id", type: "uint256" }],
     outputs: [
-      { type: "address" },
-      { type: "address" },
-      { type: "bytes32" },
-      { type: "bytes32" },
-      { type: "int256" },
-      { type: "uint256" },
-      { type: "uint256" },
-      { type: "uint8" },
+      { type: "address" }, // creator
+      { type: "address" }, // approver
+      { type: "bytes32" }, // title
+      { type: "bytes32" }, // description
+      { type: "int256" }, // votes
+      { type: "uint256" }, // target_amount
+      { type: "uint256" }, // raised_amount
+      { type: "uint8" }, // status
+      { type: "bool" }, // acknowledged (NEW)
     ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "hasVoted",
+    inputs: [
+      { name: "ticket_id", type: "uint256" },
+      { name: "user", type: "address" },
+    ],
+    outputs: [{ type: "bool" }],
     stateMutability: "view",
   },
   {
@@ -161,7 +180,7 @@ export function useCollegeFundraiser() {
       abi: CONTRACT_ABI,
       functionName: "registerUser",
       args: [stringToBytes32(name), role],
-      gas: BigInt(10_000_000),
+      gas: BigInt(500_000),
     });
   };
 
@@ -171,6 +190,7 @@ export function useCollegeFundraiser() {
       abi: CONTRACT_ABI,
       functionName: "createTicket",
       args: [stringToBytes32(title), stringToBytes32(description)],
+      gas: BigInt(500_000),
     });
   };
 
@@ -180,6 +200,7 @@ export function useCollegeFundraiser() {
       abi: CONTRACT_ABI,
       functionName: "vote",
       args: [ticketId, upvote],
+      gas: BigInt(500_000),
     });
   };
 
@@ -190,7 +211,6 @@ export function useCollegeFundraiser() {
       functionName: "fundTicket",
       args: [ticketId],
       value: parseEther(amount),
-      gas: BigInt(500_000),
     });
   };
 
@@ -205,11 +225,9 @@ export function useCollegeFundraiser() {
       abi: CONTRACT_ABI,
       functionName: "approveTicket",
       args: [ticketId, parseEther(targetAmount), startTime, endTime],
-      // gas: BigInt(500_000),
+      gas: BigInt(500_000),
     });
   };
-
-  // --- NEW FUNCTIONS ADDED BELOW ---
 
   const closeFundraising = async (ticketId: bigint) => {
     return writeContract({
@@ -241,6 +259,17 @@ export function useCollegeFundraiser() {
     });
   };
 
+  // --- NEW: Acknowledge Ticket ---
+  const acknowledgeTicket = async (ticketId: bigint) => {
+    return writeContract({
+      address: CONTRACT_ADDRESS,
+      abi: CONTRACT_ABI,
+      functionName: "acknowledgeTicket",
+      args: [ticketId],
+      gas: BigInt(500_000),
+    });
+  };
+
   return {
     init,
     registerUser,
@@ -248,9 +277,10 @@ export function useCollegeFundraiser() {
     vote,
     fundTicket,
     approveTicket,
-    closeFundraising, // Exported
-    withdrawFunds, // Exported
-    markProjectComplete, // Exported
+    closeFundraising,
+    withdrawFunds,
+    markProjectComplete,
+    acknowledgeTicket, // Exported
     isPending,
     isConfirming,
     isSuccess,
@@ -258,6 +288,8 @@ export function useCollegeFundraiser() {
     hash,
   };
 }
+
+// --- Read Hooks ---
 
 export function useTicket(ticketId: bigint) {
   return useReadContract({
@@ -282,6 +314,22 @@ export function useUser(userAddress: `0x${string}` | undefined) {
     abi: CONTRACT_ABI,
     functionName: "getUser",
     args: userAddress ? [userAddress] : undefined,
+    query: {
+      enabled: !!userAddress,
+    },
+  });
+}
+
+// --- NEW: Check if user has voted ---
+export function useHasVoted(
+  ticketId: bigint,
+  userAddress: `0x${string}` | undefined
+) {
+  return useReadContract({
+    address: CONTRACT_ADDRESS,
+    abi: CONTRACT_ABI,
+    functionName: "hasVoted",
+    args: userAddress ? [ticketId, userAddress] : undefined,
     query: {
       enabled: !!userAddress,
     },

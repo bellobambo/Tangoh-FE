@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 
 const ROLES = [
   { value: 0, label: 'Student', description: 'Can create tickets and vote' },
-  { value: 1, label: 'EXCO (Executive Committee)', description: 'Can approve tickets and manage fundraising' }
+  { value: 1, label: 'EXCO (Executive Committee)', description: 'Manage ticket & funding' }
 ];
 
 const ZERO_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
