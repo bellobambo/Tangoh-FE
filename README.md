@@ -10,7 +10,7 @@
 
 ## 📖 Overview
 
-TangoH creates a direct, transparent channel for students to report campus issues. 🚀 This platform turns ignored complaints and lost maintenance requests into prioritized, verifiable action items. From broken hostel furniture to safety hazards, TangoH ensures student concerns are heard, validated by the community, and escalated effectively.
+TangoH creates a direct, transparent channel for students to report issues they face in school (hostels or classroom). 🚀 TangoH turns ignored complaints and lost maintenance requests into prioritized, verifiable action items. From broken hostel furniture to safety hazards, TangoH ensures student concerns are heard, validated by the community, and Guaranteed follow-up.
 
 **The Problem:** Students face daily frustrations when their concerns go unheard. Reports get lost, emails are ignored, and urgent problems like broken windows or faulty equipment remain unfixed. TangoH makes it hard for students' voices to reach those who can help. 🚧
 
