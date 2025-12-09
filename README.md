@@ -1,4 +1,4 @@
-**TangoH: Amplifying Student Voices to Address Campus Issues** 🌟
+**TangoH: Amplifying Student Voices to Address School Issues** 🌟
 
 ## 🌐 Live Deployment
 **Platform:** TangoH  
